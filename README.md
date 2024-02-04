@@ -3,6 +3,6 @@ A simple minifb project to demonstrate raycasting techique
 
 Building:
 
-> cmake -G "MinGW Makefiles" .
+> cmake --preset mingw-build
 > mingw32-make.exe
 
