@@ -1,10 +1,16 @@
 #include "MiniFB.h"
 #include "MiniFB_enums.h"
-#include <math.h>
+#include <cmath>
 #include <cstdint>
 #include <vector>
 #include <memory>
 #include <utility>
+
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 
 auto mfbDeleter = [](mfb_window* ptr) {
     if (ptr != nullptr) {
@@ -76,6 +82,28 @@ void draw_line_dda(std::vector<uint32_t>& buffer, int x0, int y0, int x1, int y1
     }
 }
 
+
+void draw_line_bresenham(std::vector<uint32_t>& buffer, int x0, int y0, int x1, int y1, uint32_t color) {
+    int dx = std::abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -std::abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
+    int err = dx + dy, e2;
+
+    while(true) {
+        draw_point(buffer, x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        e2 = 2 * err;
+        if (e2 >= dy) { 
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
+
 void draw_map(std::vector<uint32_t>& buffer, std::pair<float, float> player_pos) {
     for (unsigned x = 0; x < height; ++x) {
         for (unsigned y = 0; y < width; ++y) {
@@ -92,6 +120,21 @@ void draw_map(std::vector<uint32_t>& buffer, std::pair<float, float> player_pos)
     }
 }
 
+constexpr float degrees_to_radians(int degrees) {
+    return degrees * (M_PI / 180.0f);
+}
+
+void draw_radar(std::vector<uint32_t>& buffer, int cx, int cy, float angle, int radius, uint32_t color, bool dda) {    
+    float angleRadians = degrees_to_radians(angle);
+    int x = static_cast<int>(cx + radius * std::cos(angleRadians));
+    int y = static_cast<int>(cy + radius * std::sin(angleRadians));
+    
+    if (dda) {
+	draw_line_dda(buffer, cx, cy, x, y, color);
+    } else {
+	draw_line_bresenham(buffer, cx, cy, x, y, color);
+    }
+}
 
 void keyboard(struct mfb_window *window, mfb_key key, mfb_key_mod mod, bool isPressed) {
     // Remember to close the window in some way
@@ -115,7 +158,12 @@ int main() {
         return -1;
     }
 
+    int off {100};
+
     mfb_set_keyboard_callback(window.get(), keyboard);
+
+
+    int angle {};
 
     while (mfb_wait_sync(window.get())) {
         if (mfb_update(window.get(), buffer.data()) < 0) {
@@ -133,6 +181,22 @@ int main() {
 	draw_line_dda(buffer, 100, 100, 100, 150, 0xff0000ff);
 	draw_line_dda(buffer, 100, 100, 50, 100, 0xff0000ff);
 	draw_line_dda(buffer, 100, 100, 190, 100, 0xff0000ff);
+
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 50 + off, 70 + off, 0xff0000ff);
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 120 + off, 60 + off, 0x00ff00ff);
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 50 + off, 160 + off, 0xffffffff);
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 156 + off, 151 + off, 0x0000ffff);
+
+	
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 100 + off, 70 + off, 0xff0000ff);
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 100 + off, 150 + off, 0xff0000ff);
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 50 + off, 100 + off, 0xff0000ff);
+	draw_line_bresenham(buffer, 100 + off, 100 + off, 190 + off, 100 + off, 0xff0000ff);
+
+	draw_radar(buffer, 100, 100, angle, 20, 0xff2233ff, true);
+	draw_radar(buffer, 200, 200, angle, 20, 0x4422ffff, false);
+
+	angle++;
     }
 
     return 0;
