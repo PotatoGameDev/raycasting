@@ -25,7 +25,6 @@ private:
   struct mfb_window *_window;
 
   void drawPoint(int, int, uint32_t);
-  void drawLineDDA(int, int, int, int, uint32_t);
   void drawLineBresenham(int, int, int, int, uint32_t);
   void drawRadar(int, int, float, int, uint32_t, bool);
 
@@ -39,6 +38,8 @@ public:
   void put(unsigned, unsigned, uint32_t);
 
   bool sync();
+
+  void drawLineDDA(int, int, int, int, uint32_t);
 };
 
 } // namespace potato_raycasting

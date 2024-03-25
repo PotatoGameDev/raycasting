@@ -1,24 +1,23 @@
 #include "player.h"
 #include "screen.h"
 #include "world.h"
-#include <iostream>
 
 using namespace potato_raycasting;
 
-World world{};
+World world{10};
 
 void keyboard(struct mfb_window *window, mfb_key key, mfb_key_mod mod,
               bool isPressed) {
   if (key == KB_KEY_ESCAPE) {
     mfb_close(window);
   } else if (key == KB_KEY_UP) {
-    world.controls(PlayerControls::north);
+    world.controls(PlayerControls::up);
   } else if (key == KB_KEY_DOWN) {
-    world.controls(PlayerControls::south);
+    world.controls(PlayerControls::down);
   } else if (key == KB_KEY_LEFT) {
-    world.controls(PlayerControls::west);
+    world.controls(PlayerControls::left);
   } else if (key == KB_KEY_RIGHT) {
-    world.controls(PlayerControls::east);
+    world.controls(PlayerControls::right);
   }
 }
 

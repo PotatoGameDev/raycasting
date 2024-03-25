@@ -46,7 +46,7 @@ private:
   Player _player;
 
 public:
-  World(std::vector<std::vector<int>> = default_map, int = 20, int = 100);
+  World(int = 20, int = 100, std::vector<std::vector<int>> = default_map);
 
   void draw(Screen &);
   void controls(const PlayerControls);
