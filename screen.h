@@ -3,6 +3,7 @@
 
 #include "MiniFB.h"
 #include "MiniFB_enums.h"
+#include "math.h"
 #include <cstdint>
 #include <vector>
 
@@ -40,6 +41,9 @@ public:
   bool sync();
 
   void drawLineDDA(int, int, int, int, uint32_t);
+  void drawLineDDA(const Vector2 &, const Vector2 &, uint32_t);
+
+  void drawRay(const Ray&, uint32_t);
 };
 
 } // namespace potato_raycasting

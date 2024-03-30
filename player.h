@@ -2,6 +2,7 @@
 #define POTATO_RAYCASTING_PLAYER_H
 #include "math.h"
 #include "screen.h"
+#include "camera.h"
 
 namespace potato_raycasting {
 

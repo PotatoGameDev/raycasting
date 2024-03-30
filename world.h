@@ -1,12 +1,13 @@
 #ifndef POTATO_RAYCASTING_WORLD_H
 #define POTATO_RAYCASTING_WORLD_H
 
+#include <cstdint>
+#include <vector>
 #include "MiniFB.h"
 #include "MiniFB_enums.h"
 #include "player.h"
 #include "screen.h"
-#include <cstdint>
-#include <vector>
+#include "camera.h"
 
 namespace potato_raycasting {
 
@@ -44,6 +45,7 @@ private:
   int _colorScale;
 
   Player _player;
+  Camera _cam;
 
 public:
   World(int = 20, int = 100, std::vector<std::vector<int>> = default_map);
