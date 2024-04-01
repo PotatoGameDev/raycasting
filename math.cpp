@@ -36,6 +36,16 @@ Vector2 &Vector2::operator-=(const Vector2 &rhs) {
   return *this;
 }
 
+float Vector2::len() {
+    return std::sqrt(x*x + y*y);
+}
+
+void Vector2::norm() {
+    float invLen = 1 / this->len(); 
+    x *= invLen;
+    y *= invLen;
+}
+
 std::ostream &operator<<(std::ostream &os, const Vector2 &vec) {
   os << "(" << vec.x << "," << vec.y << ")";
   return os;
@@ -59,7 +69,9 @@ void Vector2::angle(float radians) {
 
 // ========== Ray ==============
 
-Ray::Ray(Vector2 _from, Vector2 _through): from{_from}, through{_through} {}
+Ray::Ray(Vector2 _from, Vector2 _through): from{_from}, through{_through}, dir{through - from} {
+    dir.norm();
+}
 
 Ray Ray::operator*(float scalar) const {
   return Ray(from * scalar, through * scalar);

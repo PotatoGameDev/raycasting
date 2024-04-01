@@ -26,6 +26,8 @@ struct Vector2 {
 
   void rotate(float);
   void angle(float);
+  void norm();
+  float len();
 };
 
 std::ostream &operator<<(std::ostream &, const Vector2 &);
@@ -35,6 +37,7 @@ Vector2 operator/(float, const Vector2 &);
 struct Ray {
   Vector2 from;
   Vector2 through;
+  Vector2 dir;
 
   Ray(Vector2, Vector2);
 

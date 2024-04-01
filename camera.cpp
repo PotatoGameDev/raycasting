@@ -19,10 +19,11 @@ Vector2 Camera::start(const Vector2 &playerPos, const Vector2 &playerDir) {
 Vector2 Camera::end(const Vector2 &playerPos, const Vector2 &playerDir) {
   return (playerPos + playerDir * _dist) + _plane;
 }
-  Ray Camera::ray(const Vector2& playerPos, const Vector2& playerDir, float planeFraction) {
-    return {
-        playerPos,
-        start(playerPos, playerDir) + (planeFraction * 2 * _plane),
-    };
-  }
+Ray Camera::ray(const Vector2 &playerPos, const Vector2 &playerDir,
+                float planeFraction) {
+  return {
+      playerPos,
+      (playerPos + playerDir * _dist) + (planeFraction * _plane),
+  };
+}
 } // namespace potato_raycasting
