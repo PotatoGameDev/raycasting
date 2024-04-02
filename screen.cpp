@@ -57,7 +57,7 @@ void Screen::drawLineBresenham(int x0, int y0, int x1, int y1,
 }
 
 void Screen::drawRay(const Ray &ray, uint32_t colour) {
-    drawLineDDA(ray.from, ray.through, colour);
+  drawLineDDA(ray.from, ray.through, colour);
 }
 
 constexpr float degrees_to_radians(int degrees) {
@@ -96,6 +96,10 @@ void Screen::put(unsigned x, unsigned y, uint32_t colour) {
 }
 
 bool Screen::sync() { return mfb_wait_sync(_window); }
+
+Vector2 Screen::dims() {
+  return {static_cast<float>(_width), static_cast<float>(_height)};
+}
 
 Screen::~Screen() {
   if (_window) {

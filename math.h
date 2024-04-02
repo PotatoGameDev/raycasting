@@ -14,6 +14,7 @@ struct Vector2 {
   float y;
 
   Vector2(float, float);
+  Vector2(int, int);
   Vector2(const Vector2 &);
   Vector2 operator+(const Vector2 &) const;
   Vector2 operator-(const Vector2 &) const;
@@ -27,7 +28,8 @@ struct Vector2 {
   void rotate(float);
   void angle(float);
   void norm();
-  float len();
+  float len() const;
+  float dist(const Vector2 &) const;
 };
 
 std::ostream &operator<<(std::ostream &, const Vector2 &);
@@ -45,5 +47,12 @@ struct Ray {
   Ray operator/(float) const;
 };
 
+struct RayHit {
+  int type;
+  int side;
+  float dist;
+
+  RayHit(int, int, float);
+};
 } // namespace potato_raycasting
 #endif

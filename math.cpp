@@ -2,6 +2,7 @@
 
 namespace potato_raycasting {
 Vector2::Vector2(float _x, float _y) : x{_x}, y{_y} {};
+Vector2::Vector2(int _x, int _y) : x{static_cast<float>(_x)}, y{static_cast<float>(_y)} {};
 Vector2::Vector2(const Vector2 &rhs) : x{rhs.x}, y{rhs.y} {}
 
 Vector2 Vector2::operator+(const Vector2 &other) const {
@@ -36,14 +37,16 @@ Vector2 &Vector2::operator-=(const Vector2 &rhs) {
   return *this;
 }
 
-float Vector2::len() {
-    return std::sqrt(x*x + y*y);
-}
+float Vector2::len() const { return std::sqrt(x * x + y * y); }
 
 void Vector2::norm() {
-    float invLen = 1 / this->len(); 
-    x *= invLen;
-    y *= invLen;
+  float invLen = 1 / this->len();
+  x *= invLen;
+  y *= invLen;
+}
+
+float Vector2::dist(const Vector2 &other) const {
+    return (other - *this).len();
 }
 
 std::ostream &operator<<(std::ostream &os, const Vector2 &vec) {
@@ -69,8 +72,9 @@ void Vector2::angle(float radians) {
 
 // ========== Ray ==============
 
-Ray::Ray(Vector2 _from, Vector2 _through): from{_from}, through{_through}, dir{through - from} {
-    dir.norm();
+Ray::Ray(Vector2 _from, Vector2 _through)
+    : from{_from}, through{_through}, dir{through - from} {
+  dir.norm();
 }
 
 Ray Ray::operator*(float scalar) const {
@@ -79,5 +83,10 @@ Ray Ray::operator*(float scalar) const {
 Ray Ray::operator/(float scalar) const {
   return Ray(from / scalar, through / scalar);
 }
+
+// ========== RayHit ==============
+
+RayHit::RayHit(int _type, int _side, float _dist)
+    : type{_type}, side{_side}, dist{_dist} {}
 
 } // namespace potato_raycasting

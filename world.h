@@ -1,13 +1,13 @@
 #ifndef POTATO_RAYCASTING_WORLD_H
 #define POTATO_RAYCASTING_WORLD_H
 
-#include <cstdint>
-#include <vector>
 #include "MiniFB.h"
 #include "MiniFB_enums.h"
+#include "camera.h"
 #include "player.h"
 #include "screen.h"
-#include "camera.h"
+#include <cstdint>
+#include <vector>
 
 namespace potato_raycasting {
 
@@ -46,6 +46,9 @@ private:
 
   Player _player;
   Camera _cam;
+
+  void drawPoint(int, int, uint32_t, Screen &);
+  RayHit raycast(const Ray &);
 
 public:
   World(int = 20, int = 100, std::vector<std::vector<int>> = default_map);
