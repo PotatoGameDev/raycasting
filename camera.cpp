@@ -8,10 +8,11 @@ Camera::Camera(float radians, float distance)
 };
 
 void Camera::rotate(float radians) { _plane.rotate(radians + 0.5 * M_PI); }
+
 void Camera::angle(float radians) {
   _plane.x = _dist;
   _plane.y = 0.0;
-  _plane.angle(radians + 0.5 * M_PI);
+  _plane.angle(radians - 0.5 * M_PI);
 }
 Vector2 Camera::start(const Vector2 &playerPos, const Vector2 &playerDir) {
   return (playerPos + playerDir * _dist) - _plane;

@@ -4,7 +4,7 @@
 
 using namespace potato_raycasting;
 
-World world{40};
+World world{10};
 
 void keyboard(struct mfb_window *window, mfb_key key, mfb_key_mod mod,
               bool isPressed) {

@@ -66,8 +66,9 @@ void Vector2::rotate(float radians) {
 }
 
 void Vector2::angle(float radians) {
-  x = sin(radians);
-  y = cos(radians);
+  float len = this->len();
+  x = len * sin(radians);
+  y = len * cos(radians);
 }
 
 // ========== Ray ==============

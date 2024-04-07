@@ -10,16 +10,12 @@ Player::Player(float xx, float yy, float an, uint32_t c, float s)
 void Player::move(PlayerControls controls) {
   switch (controls) {
   case potato_raycasting::PlayerControls::right:
-    angle += 0.1;
-    //dir.x = sin(angle);
-    //dir.y = cos(angle);
-    dir.rotate(-0.1);
+    angle -= 0.1;
+    dir.angle(angle);
     break;
   case potato_raycasting::PlayerControls::left:
-    angle -= 0.1;
-    //dir.x = sin(angle);
-    //dir.y = cos(angle);
-    dir.rotate(0.1);
+    angle += 0.1;
+    dir.angle(angle);
     break;
   case potato_raycasting::PlayerControls::up:
     pos += speed * dir;

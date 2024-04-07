@@ -4,8 +4,8 @@
 namespace potato_raycasting {
 
 void Screen::drawPoint(int x, int y, uint32_t colour) {
-  if (x > 0 && x < _height && y > 0 && y < _width) {
-    _buffer[x * _width + y] = colour;
+  if (x > 0 && x < _width && y > 0 && y < _height) {
+    _buffer[y * _width + x] = colour;
   }
 }
 
@@ -89,7 +89,11 @@ void Screen::registerControls(mfb_keyboard_func controls) {
   mfb_set_keyboard_callback(_window, controls);
 }
 
-bool Screen::refresh() { return mfb_update(_window, _buffer.data()) < 0; }
+bool Screen::refresh() { 
+    bool res = mfb_update(_window, _buffer.data()) < 0;
+    _buffer.assign(_width * _height, 0);
+    return res;
+}
 
 void Screen::put(unsigned x, unsigned y, uint32_t colour) {
   drawPoint(x, y, colour);
