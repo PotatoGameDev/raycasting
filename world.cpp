@@ -19,12 +19,12 @@ RayHit World::raycast(const Ray &ray) {
   int mapX = int(posX);
   int mapY = int(posY);
 
-  double sideDistX;
-  double sideDistY;
+  float sideDistX;
+  float sideDistY;
 
-  double deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
-  double deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1 / rayDirY);
-  double perpWallDist;
+  float deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
+  float deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1 / rayDirY);
+  float perpWallDist;
 
   int stepX;
   int stepY;
@@ -59,9 +59,13 @@ RayHit World::raycast(const Ray &ray) {
     }
 
     if (_worldMap[mapX][mapY] > 0) {
-      return {
-          _worldMap[mapX][mapY], side,
-          ray.from.dist({static_cast<float>(mapX), static_cast<float>(mapY)})};
+      if (side == 0) {
+        perpWallDist = (sideDistX - deltaDistX);
+      } else {
+        perpWallDist = (sideDistY - deltaDistY);
+      }
+
+      return {_worldMap[mapX][mapY], side, perpWallDist};
     }
   }
   throw "Shit";
@@ -73,6 +77,13 @@ World::World(int imageScale, int colorScale,
       _player{10, 10, 0.0, 0xffffffff, 1.0}, _cam{0.0} {}
 
 void World::draw(Screen &screen) {
+  for (int y = 0; y < screen.dims().y; y++) {
+    if (y < screen.dims().y / 2) {
+      screen.drawLineDDA(0, y, screen.dims().x, y, 0x00222222);
+    } else {
+      screen.drawLineDDA(0, y, screen.dims().x, y, 0x00444444);
+    }
+  }
 
   for (int x = 0; x < screen.dims().x; x++) {
     double cameraX =
@@ -82,13 +93,13 @@ void World::draw(Screen &screen) {
 
     RayHit hit = raycast(ray);
 
-    int lineHeight = (int)(screen.dims().y / hit.dist);
+    int lineHeight = static_cast<int>(screen.dims().y / hit.dist);
 
-    int drawStart = -lineHeight / 2 + screen.dims().y / 2;
+    int drawStart = -static_cast<int>(lineHeight / 2) + screen.dims().y / 2;
     if (drawStart < 0) {
       drawStart = 0;
     }
-    int drawEnd = lineHeight / 2 + screen.dims().y / 2;
+    int drawEnd = static_cast<int>(lineHeight / 2) + screen.dims().y / 2;
     if (drawEnd >= screen.dims().y) {
       drawEnd = screen.dims().y - 1;
     }
@@ -96,7 +107,11 @@ void World::draw(Screen &screen) {
     Vector2 start{x, drawStart};
     Vector2 end{x, drawEnd};
 
-    screen.drawLineDDA(start, end, hit.type * _colorScale);
+    uint32_t colour = hit.type;
+    if (hit.side == 0) {
+      colour /= 2;
+    }
+    screen.drawLineDDA(start, end, colour * _colorScale);
   }
 
   // draw world map
