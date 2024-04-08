@@ -4,7 +4,7 @@ namespace potato_raycasting {
 
 Camera::Camera(float radians, float distance)
     : _plane{distance, 0.0}, _dist{distance} {
-  _plane.angle(radians + 0.5 * M_PI);
+  this->angle(radians);
 };
 
 void Camera::rotate(float radians) { _plane.rotate(radians + 0.5 * M_PI); }
