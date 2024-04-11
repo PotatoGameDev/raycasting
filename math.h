@@ -24,10 +24,12 @@ struct Vector2 {
   Vector2 operator/(float) const;
   Vector2 &operator+=(const Vector2 &);
   Vector2 &operator-=(const Vector2 &);
+  float dot(const Vector2&);
 
   void rotate(float);
   void angle(float);
   void norm();
+  Vector2 normalized() const;
   float len() const;
   float dist(const Vector2 &) const;
 };

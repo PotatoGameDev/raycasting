@@ -93,8 +93,14 @@ void World::draw(Screen &screen) {
 
     RayHit hit = raycast(ray);
 
-    int lineHeight = static_cast<int>(screen.dims().y / hit.dist);
+    // Fisheye correction:
+    Vector2 playerDir = _player.dir.normalized();
+    Vector2 rayDir = ray.dir.normalized();
 
+    float cosTheta = playerDir.dot(rayDir);
+    float correctedDistance = hit.dist * cosTheta;
+
+    int lineHeight = static_cast<int>(screen.dims().y / correctedDistance);
     int drawStart = -static_cast<int>(lineHeight / 2) + screen.dims().y / 2;
     if (drawStart < 0) {
       drawStart = 0;

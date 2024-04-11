@@ -37,12 +37,22 @@ Vector2 &Vector2::operator-=(const Vector2 &rhs) {
   return *this;
 }
 
+float Vector2::dot(const Vector2& other) {
+    return x * other.x + y * other.y;
+}
+
 float Vector2::len() const { return std::sqrt(x * x + y * y); }
 
 void Vector2::norm() {
   float invLen = 1 / this->len();
   x *= invLen;
   y *= invLen;
+}
+
+Vector2 Vector2::normalized() const {
+    Vector2 copy{*this};
+    copy.norm();
+    return copy;
 }
 
 float Vector2::dist(const Vector2 &other) const {
