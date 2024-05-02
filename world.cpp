@@ -113,11 +113,16 @@ RayHit World::raycast(const Ray &ray) {
 
 void World::draw(Screen &screen) {
   for (int y = 0; y < screen.dims().y; y++) {
-    if (y < screen.dims().y / 2) {
-      screen.drawLineDDA(0, y, screen.dims().x, y, 0x00222222);
-    } else {
-      screen.drawLineDDA(0, y, screen.dims().x, y, 0x00444444);
-    }
+      float ratio;
+      if (y < screen.dims().y / 2) {
+          ratio = static_cast<float>(y) / (screen.dims().y / 2);
+          uint32_t colour = applyDistanceFactorToColor(0x00222222, 1.0f - ratio);
+          screen.drawLineDDA(0, y, screen.dims().x, y, colour); 
+      } else {
+          ratio = static_cast<float>(screen.dims().y - y) / (screen.dims().y / 2);
+          uint32_t colour = applyDistanceFactorToColor(0x00444444, 1.0f - ratio);
+          screen.drawLineDDA(0, y, screen.dims().x, y, colour);
+      }
   }
 
   for (int x = 0; x < screen.dims().x; x++) {
@@ -159,11 +164,11 @@ void World::draw(Screen &screen) {
     }
 
     if (hit.side == 0) {
-      colour /= 2;
+      colour = applyDistanceFactorToColor(colour, 0.5f);
     }
 
     float distance = hit.dist;
-    float maxDistance = 15.0f;
+    float maxDistance = 12.0f;
     float distanceFactor = 1.0f - (distance / maxDistance);
 
     colour = applyDistanceFactorToColor(colour, distanceFactor);
@@ -183,15 +188,15 @@ void World::draw(Screen &screen) {
   Vector2 camB = _cam.start(playerPos, _player.dir) * _imageScale;
   Vector2 camE = _cam.end(playerPos, _player.dir) * _imageScale;
 
-  screen.drawLineDDA(camB.x, camB.y, camE.x, camE.y, 0xff4400ff);
+  screen.drawLineDDA(camB.x, camB.y, camE.x, camE.y, 0xFF4400FF);
 
   // draw player
   Ray example = _cam.ray(playerPos, _player.dir, -1.0);
-  screen.drawRay(example * _imageScale, 0xff0000ff);
+  screen.drawRay(example * _imageScale, 0xFF0000FF);
   Ray example1 = _cam.ray(playerPos, _player.dir, 0.0);
-  screen.drawRay(example1 * _imageScale, 0x00ff00ff);
+  screen.drawRay(example1 * _imageScale, 0x00FF00FF);
   Ray example2 = _cam.ray(playerPos, _player.dir, 1.0);
-  screen.drawRay(example2 * _imageScale, 0xff0000ff);
+  screen.drawRay(example2 * _imageScale, 0xFF0000FF);
 }
 
 void World::controls(PlayerControls controls) {
