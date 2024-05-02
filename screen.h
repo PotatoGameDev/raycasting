@@ -44,6 +44,7 @@ public:
   void drawLineDDA(const Vector2 &, const Vector2 &, uint32_t);
 
   void drawRay(const Ray&, uint32_t);
+  void drawVector(const Vector2&, uint32_t); 
   Vector2 dims();
 };
 

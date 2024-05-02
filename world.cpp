@@ -1,6 +1,26 @@
 #include "world.h"
+#include <cmath>
 
 namespace potato_raycasting {
+
+std::vector<std::vector<int>> transpose(const std::vector<std::vector<int>>& matrix) {
+    int rows = matrix.size();
+    if (rows == 0)
+        return {};
+    int cols = matrix[0].size();
+
+    std::vector<std::vector<int>> transposed (cols, std::vector<int>(rows));
+
+    for (int i = 0; i < rows; ++i)
+        for (int j = 0; j < cols; ++j)
+            transposed[j][i] = matrix[i][j];
+
+    return transposed;
+}
+
+World::World(int imageScale, std::vector<std::vector<int>> worldMap)
+    : _imageScale{imageScale}, _worldMap(transpose(worldMap)), 
+      _player{10, 20, 0.0, 0xffffffff, 1.0}, _cam{0.0, 1.0} {}
 
 void World::drawPoint(int mapX, int mapY, uint32_t colour, Screen &screen) {
   for (int xs{mapX * _imageScale}; xs < (mapX + 1) * _imageScale; xs++) {
@@ -8,6 +28,26 @@ void World::drawPoint(int mapX, int mapY, uint32_t colour, Screen &screen) {
       screen.put(xs, ys, colour);
     }
   }
+}
+
+uint32_t applyDistanceFactorToColor(uint32_t color, float factor) {
+  uint8_t alpha = (color >> 24) & 0xFF;
+  uint8_t red = (color >> 16) & 0xFF;
+  uint8_t green = (color >> 8) & 0xFF;
+  uint8_t blue = color & 0xFF;
+
+  alpha = static_cast<uint8_t>(
+      std::max(0, std::min(255, static_cast<int>(alpha * factor))));
+  red = static_cast<uint8_t>(
+      std::max(0, std::min(255, static_cast<int>(red * factor))));
+  green = static_cast<uint8_t>(
+      std::max(0, std::min(255, static_cast<int>(green * factor))));
+  blue = static_cast<uint8_t>(
+      std::max(0, std::min(255, static_cast<int>(blue * factor))));
+
+  return (static_cast<uint32_t>(alpha) << 24) |
+         (static_cast<uint32_t>(red) << 16) |
+         (static_cast<uint32_t>(green) << 8) | static_cast<uint32_t>(blue);
 }
 
 RayHit World::raycast(const Ray &ray) {
@@ -22,8 +62,8 @@ RayHit World::raycast(const Ray &ray) {
   float sideDistX;
   float sideDistY;
 
-  float deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
-  float deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1 / rayDirY);
+  float deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1.0 / rayDirX);
+  float deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1.0 / rayDirY);
   float perpWallDist;
 
   int stepX;
@@ -68,13 +108,8 @@ RayHit World::raycast(const Ray &ray) {
       return {_worldMap[mapX][mapY], side, perpWallDist};
     }
   }
-  throw "Shit";
+  throw "All problem all bad";
 }
-
-World::World(int imageScale, int colorScale,
-             std::vector<std::vector<int>> worldMap)
-    : _imageScale{imageScale}, _colorScale{colorScale}, _worldMap{worldMap},
-      _player{10, 10, 0.0, 0xffffffff, 1.0}, _cam{0.0} {}
 
 void World::draw(Screen &screen) {
   for (int y = 0; y < screen.dims().y; y++) {
@@ -87,7 +122,7 @@ void World::draw(Screen &screen) {
 
   for (int x = 0; x < screen.dims().x; x++) {
     double cameraX =
-        2 * x / double(screen.dims().x) - 1; // x-coordinate in camera space
+        2 * x / double(screen.dims().x) - 1;
 
     Ray ray = _cam.ray(_player.pos, _player.dir, cameraX);
 
@@ -113,32 +148,49 @@ void World::draw(Screen &screen) {
     Vector2 start{x, drawStart};
     Vector2 end{x, drawEnd};
 
-    uint32_t colour = hit.type;
+    uint32_t colour;
+    switch(hit.type)
+    {
+      case 1:  colour = 0xFFFF0000; break;
+      case 2:  colour = 0xFF00FF00; break;
+      case 3:  colour = 0xFF0000FF; break;
+      case 4:  colour = 0xFFFFFFFF; break;
+      default: colour = 0xFFEEEEEE; break; 
+    }
+
     if (hit.side == 0) {
       colour /= 2;
     }
-    screen.drawLineDDA(start, end, colour * _colorScale);
+
+    float distance = hit.dist;
+    float maxDistance = 15.0f;
+    float distanceFactor = 1.0f - (distance / maxDistance);
+
+    colour = applyDistanceFactorToColor(colour, distanceFactor);
+
+    screen.drawLineDDA(start, end, colour);
   }
 
   // draw world map
-  for (int x{0}; x < _worldMap.size(); x++) {
-    for (int y{0}; y < _worldMap.at(0).size(); y++) {
-      this->drawPoint(y, x, _worldMap[x][y] * _colorScale, screen);
+  for (int x{0}; x < _worldMap.at(0).size(); x++) {
+    for (int y{0}; y < _worldMap.size(); y++) {
+      this->drawPoint(x, y, _worldMap[x][y] * _colorScale, screen);
     }
   }
 
   // draw camera view
-  Vector2 camB = _cam.start(_player.pos, _player.dir) * _imageScale;
-  Vector2 camE = _cam.end(_player.pos, _player.dir) * _imageScale;
+  Vector2 playerPos {_player.pos};
+  Vector2 camB = _cam.start(playerPos, _player.dir) * _imageScale;
+  Vector2 camE = _cam.end(playerPos, _player.dir) * _imageScale;
 
   screen.drawLineDDA(camB.x, camB.y, camE.x, camE.y, 0xff4400ff);
 
   // draw player
-  Ray example = _cam.ray(_player.pos, _player.dir, -1.0);
+  Ray example = _cam.ray(playerPos, _player.dir, -1.0);
   screen.drawRay(example * _imageScale, 0xff0000ff);
-  Ray example1 = _cam.ray(_player.pos, _player.dir, 0.0);
+  Ray example1 = _cam.ray(playerPos, _player.dir, 0.0);
   screen.drawRay(example1 * _imageScale, 0x00ff00ff);
-  Ray example2 = _cam.ray(_player.pos, _player.dir, 1.0);
+  Ray example2 = _cam.ray(playerPos, _player.dir, 1.0);
   screen.drawRay(example2 * _imageScale, 0xff0000ff);
 }
 

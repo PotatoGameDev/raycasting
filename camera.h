@@ -9,7 +9,7 @@ Vector2 _plane;
 float _dist;
 
 public:
-  Camera(float, float = 1.0);
+  Camera(float, float);
   
   void angle(float);
   void rotate(float);

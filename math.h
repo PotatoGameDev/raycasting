@@ -1,13 +1,12 @@
 #ifndef POTATO_RAYCASTING_MATH_H
 #define POTATO_RAYCASTING_MATH_H
-#include <cmath>
-#include <iostream>
-
-namespace potato_raycasting {
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#include <iostream>
+
+namespace potato_raycasting {
 
 struct Vector2 {
   float x;

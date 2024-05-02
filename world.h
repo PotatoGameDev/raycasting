@@ -51,7 +51,7 @@ private:
   RayHit raycast(const Ray &);
 
 public:
-  World(int = 20, int = 100, std::vector<std::vector<int>> = default_map);
+  World(int = 20, std::vector<std::vector<int>> = default_map);
 
   void draw(Screen &);
   void controls(const PlayerControls);

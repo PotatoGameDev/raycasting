@@ -60,6 +60,10 @@ void Screen::drawRay(const Ray &ray, uint32_t colour) {
   drawLineDDA(ray.from, ray.through, colour);
 }
 
+void Screen::drawVector(const Vector2 &vector, uint32_t colour) {
+  drawLineDDA(0, 0, vector.x, vector.y, colour);
+}
+
 constexpr float degrees_to_radians(int degrees) {
   return degrees * (M_PI / 180.0f);
 }
