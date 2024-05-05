@@ -11,5 +11,9 @@ CTestTestfile.cmake
 _deps
 *.exe
 build
+buildHtml
 *.pdb
 .cache
+
+.commands
+

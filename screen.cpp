@@ -83,7 +83,7 @@ void Screen::drawRadar(int cx, int cy, float angle, int radius, uint32_t colour,
 
 Screen::Screen(unsigned width, unsigned height)
     : _width{width}, _height{height}, _buffer(_width * _height) {
-  _window = mfb_open("Frodo Lives", width, height);
+  _window = mfb_open("canvas", width, height);
   if (!_window) {
     throw "Could not initialize MiniFB window";
   }

@@ -133,13 +133,13 @@ void World::draw(Screen &screen) {
         if (y < screen.dims().y / 2) {
             ratio = static_cast<float>(y) / (screen.dims().y / 2);
             uint32_t colour =
-                applyDistanceFactorToColor(0x00222222, 1.0f - ratio);
+                applyDistanceFactorToColor(0xFF222222, 1.0f - ratio);
             screen.drawLineDDA(0, y, screen.dims().x, y, colour);
         } else {
             ratio =
                 static_cast<float>(screen.dims().y - y) / (screen.dims().y / 2);
             uint32_t colour =
-                applyDistanceFactorToColor(0x00444444, 1.0f - ratio);
+                applyDistanceFactorToColor(0xFF444444, 1.0f - ratio);
             screen.drawLineDDA(0, y, screen.dims().x, y, colour);
         }
     }
