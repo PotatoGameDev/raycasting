@@ -46,6 +46,8 @@ public:
   void drawRay(const Ray&, uint32_t);
   void drawVector(const Vector2&, uint32_t); 
   Vector2 dims();
+
+  void drawBmp(const std::vector<uint32_t>&, int, int);
 };
 
 } // namespace potato_raycasting

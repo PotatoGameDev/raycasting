@@ -41,6 +41,8 @@ class World {
 private:
   std::vector<std::vector<int>> _worldMap;
 
+  std::vector<uint32_t> _testBmp;
+
   int _imageScale;
   int _colorScale;
 

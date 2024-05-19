@@ -1,12 +1,24 @@
 #include "world.h"
+#include "bmp.h"
 #include "util.h"
 #include <cmath>
+#include <string>
 
 namespace potato_raycasting {
 
 World::World(int imageScale, std::vector<std::vector<int>> worldMap)
     : _imageScale{imageScale}, _worldMap(transpose(worldMap)),
-      _player{10, 20, 0.0, 0xffffffff, 1.0}, _cam{0.0, 1.0} {}
+      _player{10, 20, 0.0, 0xffffffff, 1.0}, _cam{0.0, 1.0} {
+    std::vector<uint32_t> out_pixels;
+    std::string filename {"res/test.bmp"}; 
+
+    int bmpW {16};
+    int bmpH {16};
+
+    readBMPAndConvert(filename, out_pixels, bmpW, bmpH);
+
+    _testBmp = out_pixels;
+}
 
 void World::drawPoint(int mapX, int mapY, uint32_t colour, Screen &screen) {
     for (int xs{mapX * _imageScale}; xs < (mapX + 1) * _imageScale; xs++) {
@@ -214,14 +226,16 @@ void World::draw(Screen &screen) {
     screen.drawRay(example1 * _imageScale, 0x00FF00FF);
     Ray example2 = _cam.ray(playerPos, _player.dir, 1.0);
     screen.drawRay(example2 * _imageScale, 0xFF0000FF);
+
+    screen.drawBmp(_testBmp, 16, 16);
 }
 
 void World::controls(PlayerControls controls) {
     Vector2 intent = _player.newPos(controls);
     if (intent.x > 0 && intent.x < _worldMap.size() && intent.y > 0 &&
         intent.y < _worldMap.at(0).size() &&
-        _worldMap[static_cast<int>(intent.x)]
-                 [static_cast<int>(intent.y)] == 0) {
+        _worldMap[static_cast<int>(intent.x)][static_cast<int>(intent.y)] ==
+            0) {
         _player.move(controls);
         _cam.angle(_player.angle);
     }
