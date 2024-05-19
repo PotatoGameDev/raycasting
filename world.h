@@ -40,8 +40,7 @@ const std::vector<std::vector<int>> default_map{
 class World {
 private:
   std::vector<std::vector<int>> _worldMap;
-
-  std::vector<uint32_t> _testBmp;
+  std::vector<uint32_t> _wallTexture;
 
   int _imageScale;
   int _colorScale;

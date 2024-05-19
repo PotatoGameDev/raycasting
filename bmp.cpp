@@ -39,7 +39,7 @@ struct BMPColorHeader {
     uint32_t colorSpaceType{0x73524742}; // sRGB
     uint32_t unused[16]{0};
 };
-// Function to read a BMP file and convert to uint32_t format AARRGGBB.
+
 void readBMPAndConvert(const std::string &filename,
                        std::vector<uint32_t> &out_pixels, int &width,
                        int &height) {
@@ -55,8 +55,8 @@ void readBMPAndConvert(const std::string &filename,
     file.read(reinterpret_cast<char *>(&fileHeader), sizeof(fileHeader));
     file.read(reinterpret_cast<char *>(&infoHeader), sizeof(infoHeader));
 
-    if (fileHeader.fileType != 0x4D42) { // BMP signature
-        throw std::runtime_error("Nota BMP file");
+    if (fileHeader.fileType != 0x4D42) {
+        throw std::runtime_error("Not a BMP file");
     }
 
     if (infoHeader.bitCount != 24 || infoHeader.compression != 0) {
@@ -64,12 +64,11 @@ void readBMPAndConvert(const std::string &filename,
                                  "supports uncompressed 24-bit BMP files.");
     }
 
-    // Move file pointer to the start of pixel data
     file.seekg(fileHeader.offsetData, std::ios::beg);
 
     width = infoHeader.width;
     height = infoHeader.height;
-    // BMP data is padded to have rows aligned on a 4-byte boundary
+
     int rowStride = (infoHeader.width * 3 + 3) & ~3;
 
     out_pixels.resize(width * height);

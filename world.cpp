@@ -2,7 +2,10 @@
 #include "bmp.h"
 #include "util.h"
 #include <cmath>
+#include <cstdint>
 #include <string>
+
+#define TEXTURED
 
 namespace potato_raycasting {
 
@@ -10,14 +13,14 @@ World::World(int imageScale, std::vector<std::vector<int>> worldMap)
     : _imageScale{imageScale}, _worldMap(transpose(worldMap)),
       _player{10, 20, 0.0, 0xffffffff, 1.0}, _cam{0.0, 1.0} {
     std::vector<uint32_t> out_pixels;
-    std::string filename {"res/test.bmp"}; 
+    std::string filename{"res/wall_bricks_old_64.bmp"};
 
-    int bmpW {16};
-    int bmpH {16};
+    int bmpW{64};
+    int bmpH{64};
 
     readBMPAndConvert(filename, out_pixels, bmpW, bmpH);
 
-    _testBmp = out_pixels;
+    _wallTexture = out_pixels;
 }
 
 void World::drawPoint(int mapX, int mapY, uint32_t colour, Screen &screen) {
@@ -57,11 +60,11 @@ uint32_t wallTypeToColour(int wallType) {
     return colour;
 }
 
-uint32_t applyDistanceFactorToColor(uint32_t color, float factor) {
-    uint8_t alpha = (color >> 24) & 0xFF;
-    uint8_t red = (color >> 16) & 0xFF;
-    uint8_t green = (color >> 8) & 0xFF;
-    uint8_t blue = color & 0xFF;
+uint32_t applyDistanceFactorToColor(uint32_t colour, float factor) {
+    uint8_t alpha = (colour >> 24) & 0xFF;
+    uint8_t red = (colour >> 16) & 0xFF;
+    uint8_t green = (colour >> 8) & 0xFF;
+    uint8_t blue = colour & 0xFF;
 
     alpha = static_cast<uint8_t>(
         std::max(0, std::min(255, static_cast<int>(alpha * factor))));
@@ -184,6 +187,50 @@ void World::draw(Screen &screen) {
         Vector2 start{x, drawStart};
         Vector2 end{x, drawEnd};
 
+        // ==============================================
+        // texturing
+        double wallX;
+        if (hit.side == 0) {
+            wallX = _player.pos.y + hit.dist * rayDir.y;
+        } else {
+            wallX = _player.pos.x + hit.dist * rayDir.x;
+        }
+        wallX -= floor((wallX));
+
+        // x coordinate on the texture
+        int texX = int(wallX * double(64));
+        if (hit.side == 0 && ray.dir.x > 0) {
+            texX = 64 - texX - 1;
+        }
+        if (hit.side == 1 && ray.dir.y < 0) {
+            texX = 64 - texX - 1;
+        }
+
+#ifdef TEXTURED
+        double step = 1.0 * 64 / lineHeight;
+
+        // Starting texture coordinate
+        double texPos =
+            (drawStart - screen.dims().y / 2 + lineHeight / 2) * step;
+        for (int y = drawStart; y < drawEnd; y++) {
+            // Cast the texture coordinate to integer, and mask with (texHeight
+            // - 1) in case of overflow
+            int texY = (int)texPos & (64 - 1);
+            texPos += step;
+            uint32_t colour = _wallTexture[64 * texY + texX];
+
+            if (hit.side == 1) {
+                colour = applyDistanceFactorToColor(colour, 0.5f);
+            }
+
+            float distance = hit.dist;
+            float maxDistance = 12.0f;
+            float distanceFactor = 1.0f - (distance / maxDistance);
+            colour = applyDistanceFactorToColor(colour, distanceFactor);
+
+            screen.drawPoint(x, y, colour);
+        }
+#elif
         uint32_t colour = wallTypeToColour(hit.type);
 
         if (hit.side == 0) {
@@ -197,6 +244,7 @@ void World::draw(Screen &screen) {
         colour = applyDistanceFactorToColor(colour, distanceFactor);
 
         screen.drawLineDDA(start, end, colour);
+#endif
     }
 
     // draw world map
@@ -227,7 +275,7 @@ void World::draw(Screen &screen) {
     Ray example2 = _cam.ray(playerPos, _player.dir, 1.0);
     screen.drawRay(example2 * _imageScale, 0xFF0000FF);
 
-    screen.drawBmp(_testBmp, 16, 16);
+    // screen.drawBmp(_wallTexture, 64, 64);
 }
 
 void World::controls(PlayerControls controls) {

@@ -25,7 +25,6 @@ private:
 
   struct mfb_window *_window;
 
-  void drawPoint(int, int, uint32_t);
   void drawLineBresenham(int, int, int, int, uint32_t);
   void drawRadar(int, int, float, int, uint32_t, bool);
 
@@ -43,6 +42,7 @@ public:
   void drawLineDDA(int, int, int, int, uint32_t);
   void drawLineDDA(const Vector2 &, const Vector2 &, uint32_t);
 
+  void drawPoint(int, int, uint32_t);
   void drawRay(const Ray&, uint32_t);
   void drawVector(const Vector2&, uint32_t); 
   Vector2 dims();
